@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>The Time Box Planner</title>
+    
+    <link rel="manifest" href="manifest.json">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <style>
+        :root {
+            --border-color: #000;
+            --bg-color: #fff;
+            --dot-color: #d1d1d1;
+            --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            /* 모바일에서 당겨서 새로고침 방지 (앱 느낌) */
+            overscroll-behavior-y: none;
+        }
+
+        .planner-container {
+            background-color: var(--bg-color);
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 250px 1fr 1fr;
+            grid-template-rows: auto 1fr;
+            gap: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+        }
+
+        h2, h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: #333;
+        }
+        
+        textarea {
+            resize: none;
+            line-height: 1.5;
+            height: 100%;
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .logo span {
+            display: block;
+        }
+
+        .date-input {
+            border-bottom: 1px solid var(--border-color);
+            width: 200px;
+            text-align: right;
+            font-size: 1.1rem;
+            border-radius: 0; /* iOS 기본 스타일 제거 */
+        }
+
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .priorities-list {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+        }
+
+        .priority-item {
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+        }
+        .priority-item:last-child { border-bottom: none; }
+
+        .brain-dump-area {
+            flex-grow: 1;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+            background-size: 20px 20px;
+            min-height: 300px;
+        }
+
+        .center-column {
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .time-header {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: bold;
+            text-align: center;
+            padding: 5px 0;
+        }
+        .th-time { width: 40px; }
+        .th-slot { flex: 1; border-left: 1px solid var(--border-color); }
+
+        .time-row {
+            display: flex;
+            height: 40px;
+            border-bottom: 1px solid #ccc;
+        }
+        .time-row:last-child { border-bottom: none; }
+
+        .time-label {
+            width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            background-color: #f9f9f9;
+        }
+
+        .time-slot {
+            flex: 1;
+            border-left: 1px solid var(--border-color);
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .notes-area {
+            flex-grow: 1;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+            background-size: 20px 20px;
+            min-height: 500px;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        button:hover { opacity: 1; }
+        
+        /* 설치 버튼은 기본적으로 숨김 (JS로 제어) */
+        #installBtn { display: none; }
+
+        @media (max-width: 768px) {
+            .planner-container {
+                grid-template-columns: 1fr;
+                padding: 15px;
+                gap: 30px;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .date-input {
+                width: 100%;
+                text-align: left;
+            }
+            .left-column, .right-column, .center-column { width: 100%; }
+            .brain-dump-area, .notes-area { min-height: 250px; }
+            body { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="planner-container">
+        <div class="header">
+            <div class="logo">
+                <span>The</span>
+                <span>Time</span>
+                <span>Box.</span>
+            </div>
+            <div>
+                <label style="font-weight: bold; margin-right: 10px;">Date</label>
+                <input type="text" id="dateInput" class="date-input" placeholder="YYYY. MM. DD">
+            </div>
+        </div>
+
+        <div class="left-column">
+            <div>
+                <h3>Top Priorities</h3>
+                <div class="priorities-list">
+                    <div class="priority-item"><input type="text" id="prio1" placeholder="1."></div>
+                    <div class="priority-item"><input type="text" id="prio2" placeholder="2."></div>
+                    <div class="priority-item"><input type="text" id="prio3" placeholder="3."></div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; flex-grow: 1;">
+                <h3>Brain Dump</h3>
+                <div class="brain-dump-area">
+                    <textarea id="brainDump" placeholder="Write down everything..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="center-column">
+            <div class="time-header">
+                <div class="th-time"></div>
+                <div class="th-slot">:00</div>
+                <div class="th-slot">:30</div>
+            </div>
+            <div id="schedule-container"></div>
+        </div>
+
+        <div class="right-column">
+            <h3>Notes</h3>
+            <div class="notes-area">
+                <textarea id="notes" placeholder="Notes..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="installBtn">📲 Install App</button>
+        <button class="btn-reset" onclick="clearAll()">Reset</button>
+    </div>
+
+    <script>
+        // --- 1. 스케줄 생성 로직 ---
+        const startHour = 5;
+        const endHour = 23;
+        const scheduleContainer = document.getElementById('schedule-container');
+        
+        for (let i = startHour; i <= endHour; i++) {
+            let displayHour = i;
+            if (i > 12) displayHour = i - 12;
+            const row = document.createElement('div');
+            row.className = 'time-row';
+            row.innerHTML = `
+                <div class="time-label">${displayHour}</div>
+                <div class="time-slot"><input type="text" id="time-${i}-00"></div>
+                <div class="time-slot"><input type="text" id="time-${i}-30"></div>
+            `;
+            scheduleContainer.appendChild(row);
+        }
+
+        // --- 2. 데이터 저장/로드 (LocalStorage) ---
+        const inputs = document.querySelectorAll('input, textarea');
+        function saveData() {
+            inputs.forEach(input => localStorage.setItem(input.id, input.value));
+        }
+        function loadData() {
+            inputs.forEach(input => {
+                const savedValue = localStorage.getItem(input.id);
+                if (savedValue) input.value = savedValue;
+            });
+        }
+        function clearAll() {
+            if(confirm('Clear all data?')) {
+                localStorage.clear();
+                inputs.forEach(input => input.value = '');
+            }
+        }
+        inputs.forEach(input => input.addEventListener('input', saveData));
+        window.onload = loadData;
+
+        // --- 3. PWA 서비스 워커 등록 ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW Registered', reg))
+                    .catch(err => console.log('SW Failed', err));
+            });
+        }
+
+        // --- 4. 설치 버튼 로직 ---
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block'; // 설치 가능한 환경이면 버튼 표시
+        });
+
+        installBtn.addEventListener('click', (e) => {
+            installBtn.style.display = 'none';
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted install');
+                }
+                deferredPrompt = null;
+            });
+        });
+    </script>
+</body>
+</html>
