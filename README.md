@@ -1,25 +1,26 @@
 # ⏳ The Time Box Planner (Web App)
 
-유명한 생산성 도구인 **'The Time Box'**를 웹으로 구현한 프로젝트입니다.  
-별도의 서버나 로그인 없이 브라우저에 데이터가 자동 저장되며, 앱처럼 설치하여 사용할 수 있습니다.
+A digital adaptation of the popular productivity tool, **'The Time Box'**.  
+This project is a serverless web application that runs directly in your browser, featuring auto-save and offline capabilities.
 
-> **[바로가기](https://seory0.github.io/timebox-planner/)**
+> **[Demo](https://seory0.github.io/timebox-planner/)**
 
-## ✨ 주요 기능
+## ✨ Key Features
 
-* **💾 자동 저장**: 브라우저의 LocalStorage를 사용하여 입력한 내용이 실시간으로 저장됩니다. 창을 닫아도 데이터가 유지됩니다.
-* **📱 반응형 디자인**: PC의 3단 레이아웃(Priorities/Schedule/Notes)과 모바일의 최적화된 세로 레이아웃을 모두 지원합니다.
-* **📲 PWA 지원 (앱 설치)**: 스마트폰과 PC에서 '앱 설치'를 통해 네이티브 앱처럼 아이콘을 두고 사용할 수 있습니다.
-* **🌐 오프라인 실행**: 인터넷 연결이 끊겨도 이전에 접속한 기록이 있다면 실행 가능합니다.
+* **💾 Auto-Save**: Your data is automatically saved to LocalStorage. You can close the tab and come back anytime without losing your progress.
+* **📱 Responsive Design**: Optimized layouts for both desktop (3-column view) and mobile (vertical view).
+* **📲 PWA Support**: Installable as a native-like app on Android, iOS, and PC.
+* **🌐 Offline Access**: Works without an internet connection once loaded.
 
-## 🚀 사용 방법
 
-1.  **웹 접속**: 위 데모 링크로 접속합니다.
-2.  **작성**: 목표(Priorities), 할 일(Brain Dump), 시간표, 노트를 자유롭게 작성합니다.
-3.  **설치 (선택)**:
-    * **PC/Android**: 화면 내 `📲 Install App` 버튼 또는 주소창의 설치 아이콘 클릭
-    * **iOS**: Safari '공유' 버튼 → '홈 화면에 추가' 클릭
-4.  **초기화**: 새로운 하루를 시작하려면 우측 하단의 `Reset` 버튼을 누르세요.
+## 🚀 How to Use
+
+1.  **Access**: Open the live demo link.
+2.  **Plan**: Fill in your *Top Priorities*, *Brain Dump*, *Schedule*, and *Notes*.
+3.  **Install (Optional)**:
+    * **Android/PC**: Click the `📲 Install App` button or the install icon in the address bar.
+    * **iOS (Safari)**: Tap 'Share' → 'Add to Home Screen'.
+4.  **Reset**: Click the `Reset` button to clear all data for a fresh start.
 
 ---
 © 2025 SEORY0. All rights reserved.
